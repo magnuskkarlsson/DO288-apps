@@ -1,0 +1,17 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: null
+  labels:
+    app: famous-quotes
+    app.kubernetes.io/component: famous-quotes
+    app.kubernetes.io/instance: famous-quotes
+  name: famous-quotes
+spec:
+  port:
+    targetPort: 8000-tcp
+  to:
+    kind: ""
+    name: famous-quotes
+    weight: null
+status: {}

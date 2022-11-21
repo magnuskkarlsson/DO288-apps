@@ -1,0 +1,4 @@
+resources:
+  - famous-quotes.yaml
+  - famous-quotes-db.yaml
+  - famous-quotes-route.yaml
