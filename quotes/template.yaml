@@ -79,6 +79,8 @@ spec:
   selector:
     matchLabels:
       deployment: quotes
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -95,7 +97,7 @@ spec:
           value: redhat123
         - name: DATABASE_NAME
           value: mydb
-        image: quotes:latest
+        image: "quotes:latest"
         imagePullPolicy: IfNotPresent
         name: quotes
         ports:
@@ -117,7 +119,7 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: quotes:latest
+      name: "quotes:latest"
   runPolicy: Serial
   source:
     contextDir: quotes
