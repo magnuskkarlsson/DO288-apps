@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: List
+metadata: {}
+items:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: php-app
+      template: php-mysql-ephemeral
+    name: php-app
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      description: Defines how to build the application
+    labels:
+      app: php-app
+      template: php-mysql-ephemeral
+    name: php-app
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: php-app:latest
+    source:
+      contextDir: "quotes"
+      git:
+        ref: ""
+        uri: https://github.com/magnuskkarlsson/DO288-apps/
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: php:7.4-ubi8
+          namespace: openshift
+      type: Source
+    triggers:
+    - type: ImageChange
+    - type: ConfigChange
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: php-app
+      template: php-mysql-ephemeral
+    name: php-app
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: php-app
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: php-app
+        name: php-app
+      spec:
+        containers:
+        - env:
+          - name: DATABASE_SERVICE_NAME
+            value: mysql
+          - name: DATABASE_NAME
+            value: quotesdb
+          - name: DATABASE_USER
+            value: quotesuser
+          - name: DATABASE_PASSWORD
+            value: redhat123
+          image: php-app:latest
+          name: php-app
+          ports:
+          - containerPort: 8080
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: php-app
+      template: php-mysql-ephemeral
+    name: php-app
+  spec:
+    ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+    selector:
+      app: php-app
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: php-app
+      template: php-mysql-ephemeral
+    name: php-app
+  spec:
+    host: ""
+    to:
+      kind: Service
+      name: php-app
+
